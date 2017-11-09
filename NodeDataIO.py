@@ -3,25 +3,24 @@
 '''
 节点信息的读取和存储
 '''
-import random,os
-import codecs
+import random, os
 
 class NodeDataIO:
     def __init__(self):
-        '''
         root = "/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary"
         file_names = []
         for parent, catalog, filename in os.walk(root):
             file_names = filename
+        file_names.remove('.DS_Store')
         x = random.randint(0, len(file_names) - 1)
-        self.fileName = file_names[x]
-        print("choose a password dictionary: " + self.fileName)
+        self.fileName1 = file_names[x]
+        print("choose a password dictionary: " + self.fileName1)
         self.fr = open("/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/"
-                       + self.fileName, 'r', encoding='gb2312', errors='ignore')
-                       '''
+                       + self.fileName1, 'r', encoding='utf-8', errors='ignore')
 
-        self.fileName = '/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary1.txt'
-        self.fr = open(self.fileName,'r')
+        #self.fileName = '/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary1.txt'
+        #self.fr = open(self.fileName,'r')
+
 
     #从文件中读取下一个节点的信息
     def __readNextNode(self):

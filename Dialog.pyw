@@ -4,6 +4,7 @@
 import tkinter
 from HuffumanTree import *
 from NodeDataIO import *
+from decode import*
 import tkinter.messagebox
 from tkinter.filedialog import *
 import os,sys,re, random
@@ -25,7 +26,8 @@ class MyDialog:
         self.encoding.bind('<FocusIn>', self.focusEncoding)
         self.string.grid(row = 0, column = 1)
         self.encoding.grid(row = 1, column = 1)
-        trans = Button(root, text = "随机选一个密码字典，开始转换٩(˃̶͈̀௰˂̶͈́)و", command = self.transform)
+        trans = Button(root, text = "加密٩(˃̶͈̀௰˂̶͈́)و", command = self.transform)
+        dec = Button(root, text="解密٩(˃̶͈̀௰˂̶͈́)و", command=self.decode)
         self.__reset = Button(root, text = "重置一下˃̣̣̥᷄⌓˂̣̣̥᷅", command = self.__reset)
         dict = Button(root, text = "生成加密字典库，随机赋权值", command = self.dictionary)
         tree = Button(root, text = "输出树", command = self.printTree)
@@ -34,9 +36,10 @@ class MyDialog:
         putStr = Button(root, text = "将解密结果导出到文件", command = self.putStr)
         putEnc = Button(root, text = "将加密结果导出到文件", command = self.putEnc)
         trans.grid(row = 2, column = 2)
+        dec.grid(row=2, column=3)
         dict.grid(row = 2, column = 0)
         tree.grid(row = 2,column = 1)
-        self.__reset.grid(row = 2, column = 3)
+        self.__reset.grid(row = 2, column = 4)
         getStr.grid(row = 0, column = 2)
         getEnc.grid(row = 1, column = 2)
         putStr.grid(row = 0, column = 3)
@@ -62,11 +65,11 @@ class MyDialog:
             for result in results:
                 dictionary[result] = li1[value]     # 单词为字典的键，随机数为值，作为每个单词的权重
                 value += 1
-            #number = random.randint(0,1000)
-            #output = open("/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary%d.txt" % number, "w")
-            output = open("/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary1.txt", "w")
+            number = random.randint(100, 999)
+            output = open("/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary%d.txt" % number, "w")
+            #output = open("/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary1.txt", "w")
             print(dictionary)
-            #print("create password dictionary：" + "dictionary%d.txt" % number)
+            print("create password dictionary：" + "dictionary%d.txt" % number)
             for key in dictionary:
                 output.writelines(key + ":" + str(dictionary[key]) + "\n")     # 字典内容写入文件
             output.close()
@@ -79,6 +82,7 @@ class MyDialog:
         tree = HuffumanTree(nodeList)
         tree.display(tree.getTree())
         os.system('notepad tree.txt')
+        return io
 
     #字符串导出到文件
     def putStr(self):
@@ -154,10 +158,23 @@ class MyDialog:
         nodeList = io.getNodes()
         tree = HuffumanTree(nodeList)
         encoder = Encoding(tree.encodingList)
+        count = io.fileName1[10:13]
+        self.count = count
         if(self.encoding['state'] != 'disabled')and(self.string['state'] != 'disabled'):
                 return
         elif(self.encoding['state'] == 'disabled')and(self.string['state'] != 'disabled'):
-                self.__encode(encoder)
+            text = self.string.get('0.0', END).strip('\n')
+            # x = words.split(' ')
+            # text = ''.join(x)
+            try:
+                encoding = bin(int(io.fileName1[10:13]))[2:] + encoder.getStringEncoding(text)
+            except:
+                tkinter.messagebox.showerror('错误', '您输入的文本中包含未编码的字符，请重新输入！')
+                return
+            self.encoding['state'] = 'normal'
+            self.encoding.delete('0.0', END)
+            self.encoding.insert('0.0', encoding)
+            self.__reset.focus_set()
         else:
                 self.__decode(encoder)
 
@@ -170,16 +187,17 @@ class MyDialog:
         self.__reset.focus_set()
 
     #编码
+    '''
     def __encode(self, encoder):
         text = self.string.get('0.0', END).strip('\n')
         #x = words.split(' ')
         #text = ''.join(x)
         try:
-            encoding=encoder.getStringEncoding(text)
+            encoding = encoder.getStringEncoding(text)
         except:
             tkinter.messagebox.showerror('错误', '您输入的文本中包含未编码的字符，请重新输入！')
             return
-        self.encoding['state']='normal'
+        self.encoding['state'] = 'normal'
         self.encoding.delete('0.0', END)
         self.encoding.insert('0.0', encoding)
         self.__reset.focus_set()
@@ -187,8 +205,9 @@ class MyDialog:
     #解码
     def __decode(self,encoder):
         text = self.encoding.get('0.0', END).strip('\n')
+        text1 = text.split(' ', 1)
         try:
-            string = encoder.getStringDecoding(text)
+            string = encoder.getStringDecoding(str(text1[0]))
         except:
              tkinter.messagebox.showerror('错误', '无法解码，请重新输入!')
              return
@@ -196,5 +215,30 @@ class MyDialog:
         self.string.delete('0.0', END)
         self.string.insert('0.0', string)
         self.__reset.focus_set()
+        '''
+
+    def decode(self):
+        text = self.encoding.get('0.0', END).strip('\n')
+        #text1 = text.split(' ', 1)
+
+        if text.startswith(bin(int(self.count))[2:]):
+            text = text[len(bin(int(self.count))[2:]):]
+        global de_fr
+        de_fr = open("/Users/zhangchuyue/Desktop/B15040805张楚月_哈夫曼加解密工具/password dictionary/dictionary"
+                      + self.count + '.txt', 'r', encoding='utf-8', errors='ignore')
+        new = Decode(de_fr)
+        nodeList = new.getNodes()
+        tree = HuffumanTree(nodeList)
+        encoder = Encoding(tree.encodingList)
+        try:
+            string = encoder.getStringDecoding(str(text))
+        except:
+            tkinter.messagebox.showerror('错误', '无法解码，请重新输入!')
+            return
+        self.string['state'] = 'normal'
+        self.string.delete('0.0', END)
+        self.string.insert('0.0', string)
+        self.__reset.focus_set()
+
 
 MyDialog()

@@ -61,7 +61,7 @@ class HuffumanTree:
             return self.__createTree(nodeList)
 
 
-    def display(self,root):
+    def display(self, root):
         self.fw = open('tree.txt', 'w')
         self.__display(root)
         self.fw.close()
